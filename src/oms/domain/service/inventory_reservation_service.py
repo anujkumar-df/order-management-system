@@ -62,3 +62,18 @@ class InventoryReservationService:
                 )
             inv.release(line.quantity.value)
             self._inventory_repo.save(inv)
+
+    def fulfill_for_order(self, order: Order) -> None:
+        """Permanently deduct reserved inventory for a fulfilled order.
+
+        For each line item, calls ``fulfill()`` on the InventoryItem which
+        reduces both ``reserved_quantity`` and ``total_quantity``.
+        """
+        for line in order.items:
+            inv = self._inventory_repo.get_by_product_id(line.product_id)
+            if inv is None:
+                raise EntityNotFoundError(
+                    f"No inventory record for product '{line.product_name}'"
+                )
+            inv.fulfill(line.quantity.value)
+            self._inventory_repo.save(inv)

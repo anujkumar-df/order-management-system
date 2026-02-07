@@ -18,6 +18,7 @@ from oms.domain.model.value_objects import Money, Quantity
 class OrderStatus(Enum):
     DRAFT = "DRAFT"
     CONFIRMED = "CONFIRMED"
+    FULFILLED = "FULFILLED"
     CANCELLED = "CANCELLED"
 
 
@@ -104,6 +105,21 @@ class Order:
             )
         self.status = OrderStatus.CONFIRMED
 
+    def fulfill(self) -> None:
+        """Transition CONFIRMED -> FULFILLED.
+
+        Inventory fulfillment (deducting stock) must happen *before*
+        calling this (coordinated by the application handler via the
+        domain service).
+        """
+        if self.status == OrderStatus.FULFILLED:
+            raise ValidationError("Order already fulfilled")
+        if self.status != OrderStatus.CONFIRMED:
+            raise ValidationError(
+                f"Cannot fulfill order in {self.status.value} status"
+            )
+        self.status = OrderStatus.FULFILLED
+
     def cancel(self) -> None:
         """Transition DRAFT|CONFIRMED -> CANCELLED.
 
@@ -112,6 +128,8 @@ class Order:
         """
         if self.status == OrderStatus.CANCELLED:
             raise ValidationError("Order is already cancelled")
+        if self.status == OrderStatus.FULFILLED:
+            raise ValidationError("Cannot cancel order in FULFILLED status")
         self.status = OrderStatus.CANCELLED
 
     # --- Computed properties --------------------------------------------------

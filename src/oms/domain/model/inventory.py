@@ -53,3 +53,19 @@ class InventoryItem:
                 f"— only {self.reserved_quantity} currently reserved"
             )
         self.reserved_quantity -= quantity
+
+    def fulfill(self, quantity: int) -> None:
+        """Permanently deduct fulfilled stock.
+
+        Moves items from reserved to shipped — both ``total_quantity``
+        and ``reserved_quantity`` decrease by the same amount.
+        """
+        if quantity <= 0:
+            raise ValidationError("Fulfill quantity must be positive")
+        if quantity > self.reserved_quantity:
+            raise ValidationError(
+                f"Cannot fulfill {quantity} of {self.product_name} "
+                f"— only {self.reserved_quantity} currently reserved"
+            )
+        self.reserved_quantity -= quantity
+        self.total_quantity -= quantity

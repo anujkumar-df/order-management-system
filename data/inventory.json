@@ -1,14 +1,1 @@
-[
-  {
-    "product_id": "1",
-    "product_name": "Widget",
-    "total_quantity": 100,
-    "reserved_quantity": 0
-  },
-  {
-    "product_id": "2",
-    "product_name": "Gadget",
-    "total_quantity": 50,
-    "reserved_quantity": 0
-  }
-]
+[]

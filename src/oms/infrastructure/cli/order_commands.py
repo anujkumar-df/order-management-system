@@ -8,6 +8,7 @@ from oms.application.cancel_order import CancelOrderHandler
 from oms.application.confirm_order import ConfirmOrderHandler
 from oms.application.create_order import CreateOrderHandler
 from oms.application.dto import OrderItemSpec
+from oms.application.fulfill_order import FulfillOrderHandler
 from oms.application.show_order import ShowOrderHandler
 from oms.domain.exceptions import DomainException
 from oms.infrastructure.bootstrap import (
@@ -129,3 +130,20 @@ def order_cancel(order_id: int) -> None:
         raise click.ClickException(str(exc))
 
     click.echo(f"Order #{order_id} cancelled.")
+
+
+@click.command("fulfill")
+@click.option("--id", "order_id", required=True, type=int, help="Order ID to fulfill.")
+def order_fulfill(order_id: int) -> None:
+    """Fulfill a confirmed order (ships items, deducts inventory)."""
+    handler = FulfillOrderHandler(
+        order_repo=order_repository(),
+        inventory_repo=inventory_repository(),
+    )
+
+    try:
+        handler.handle(order_id)
+    except DomainException as exc:
+        raise click.ClickException(str(exc))
+
+    click.echo(f"Order #{order_id} fulfilled — items shipped.")
