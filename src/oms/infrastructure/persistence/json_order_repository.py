@@ -66,6 +66,7 @@ class JsonOrderRepository(OrderRepository):
                     "quantity": item.quantity.value,
                     "unit_price": str(item.unit_price.amount),
                     "currency": item.unit_price.currency,
+                    "shipped_quantity": item.shipped_quantity,
                 }
                 for item in order.items
             ],
@@ -79,6 +80,7 @@ class JsonOrderRepository(OrderRepository):
                 product_name=i["product_name"],
                 quantity=Quantity(i["quantity"]),
                 unit_price=Money(Decimal(i["unit_price"]), i.get("currency", "USD")),
+                shipped_quantity=i.get("shipped_quantity", 0),
             )
             for i in raw["items"]
         ]

@@ -25,6 +25,8 @@ class OrderLineItemDTO:
     quantity: int
     unit_price: str  # formatted, e.g. "$15.00"
     line_total: str
+    shipped_quantity: int = 0
+    remaining_quantity: int = 0
 
 
 @dataclass(frozen=True)
@@ -37,3 +39,4 @@ class OrderDTO:
     items: list[OrderLineItemDTO]
     total: str
     created_at: str
+    has_shipments: bool = False

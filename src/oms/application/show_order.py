@@ -31,9 +31,12 @@ class ShowOrderHandler:
                     quantity=item.quantity.value,
                     unit_price=str(item.unit_price),
                     line_total=str(item.line_total),
+                    shipped_quantity=item.shipped_quantity,
+                    remaining_quantity=item.remaining_quantity,
                 )
                 for item in order.items
             ],
             total=str(order.total),
             created_at=order.created_at.strftime("%Y-%m-%d %H:%M UTC"),
+            has_shipments=order.has_shipments,
         )

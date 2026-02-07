@@ -53,27 +53,46 @@ class InventoryReservationService:
             self._inventory_repo.save(inv)
 
     def release_for_order(self, order: Order) -> None:
-        """Release previously reserved inventory for an order."""
+        """Release previously reserved inventory for an order.
+
+        For PARTIALLY_FULFILLED orders, only releases the *remaining*
+        (unshipped) quantities.
+        """
         for line in order.items:
+            qty = line.remaining_quantity
+            if qty <= 0:
+                continue
             inv = self._inventory_repo.get_by_product_id(line.product_id)
             if inv is None:
                 raise EntityNotFoundError(
                     f"No inventory record for product '{line.product_name}'"
                 )
-            inv.release(line.quantity.value)
+            inv.release(qty)
             self._inventory_repo.save(inv)
 
     def fulfill_for_order(self, order: Order) -> None:
-        """Permanently deduct reserved inventory for a fulfilled order.
+        """Permanently deduct all remaining reserved inventory.
 
-        For each line item, calls ``fulfill()`` on the InventoryItem which
+        Convenience method that fulfills every remaining quantity.
+        """
+        quantities = {
+            line.product_id: line.remaining_quantity
+            for line in order.items
+            if line.remaining_quantity > 0
+        }
+        self.fulfill_items(quantities)
+
+    def fulfill_items(self, quantities: dict[str, int]) -> None:
+        """Permanently deduct specified quantities from inventory.
+
+        For each product, calls ``fulfill()`` on the InventoryItem which
         reduces both ``reserved_quantity`` and ``total_quantity``.
         """
-        for line in order.items:
-            inv = self._inventory_repo.get_by_product_id(line.product_id)
+        for product_id, qty in quantities.items():
+            inv = self._inventory_repo.get_by_product_id(product_id)
             if inv is None:
                 raise EntityNotFoundError(
-                    f"No inventory record for product '{line.product_name}'"
+                    f"No inventory record for product ID '{product_id}'"
                 )
-            inv.fulfill(line.quantity.value)
+            inv.fulfill(qty)
             self._inventory_repo.save(inv)

@@ -1,7 +1,11 @@
 """Application service: Cancel Order use case.
 
-If the order was CONFIRMED, releases reserved inventory before
-cancelling.  DRAFT orders can be cancelled without inventory changes.
+If the order was CONFIRMED or PARTIALLY_FULFILLED, releases remaining
+reserved inventory before cancelling.  DRAFT orders can be cancelled
+without inventory changes.
+
+For PARTIALLY_FULFILLED orders, only the *unshipped* reserved quantities
+are released; shipped items are preserved as a historical record.
 """
 
 from __future__ import annotations
@@ -30,8 +34,10 @@ class CancelOrderHandler:
         if order is None:
             raise EntityNotFoundError(f"Order #{order_id} not found")
 
-        # Release inventory only if the order had reserved it
-        if order.status == OrderStatus.CONFIRMED:
+        # Release inventory if the order had reserved it.
+        # For PARTIALLY_FULFILLED, release_for_order uses remaining_quantity
+        # (unshipped items only).
+        if order.status in (OrderStatus.CONFIRMED, OrderStatus.PARTIALLY_FULFILLED):
             svc = InventoryReservationService(self._inventory_repo)
             svc.release_for_order(order)
 
