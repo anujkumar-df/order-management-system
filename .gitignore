@@ -11,5 +11,4 @@ build/
 venv/
 
 # Runtime data (auto-created by JSON repositories on first use)
-data/orders.json
-data/inventory.json
+data/

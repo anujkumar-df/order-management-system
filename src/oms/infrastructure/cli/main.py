@@ -8,7 +8,7 @@ from oms.infrastructure.cli.order_commands import (
     order_fulfill,
     order_show,
 )
-from oms.infrastructure.cli.product_commands import product_list, product_update
+from oms.infrastructure.cli.product_commands import product_add, product_list, product_update
 
 
 @click.group()
@@ -37,6 +37,7 @@ order.add_command(order_confirm)
 order.add_command(order_create)
 order.add_command(order_fulfill)
 order.add_command(order_show)
+product.add_command(product_add)
 product.add_command(product_list)
 product.add_command(product_update)
 inventory.add_command(inventory_set)

@@ -4,9 +4,25 @@ from __future__ import annotations
 
 import click
 
+from oms.application.add_product import AddProductHandler
 from oms.application.update_product import UpdateProductHandler
 from oms.domain.exceptions import DomainException
 from oms.infrastructure.bootstrap import product_repository
+
+
+@click.command("add")
+@click.option("--name", required=True, help="Product name.")
+@click.option("--price", required=True, help="Price (e.g. 15.00).")
+def product_add(name: str, price: str) -> None:
+    """Add a new product to the catalog."""
+    handler = AddProductHandler(product_repo=product_repository())
+
+    try:
+        product = handler.handle(name=name, price=price)
+    except DomainException as exc:
+        raise click.ClickException(str(exc))
+
+    click.echo(f"Product #{product.id} '{product.name}' added at {product.price}")
 
 
 @click.command("list")
