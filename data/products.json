@@ -1,32 +1,7 @@
 [
-  {
-    "id": "1",
-    "name": "Widget",
-    "price": "99.99",
-    "currency": "USD"
-  },
-  {
-    "id": "2",
-    "name": "Gadget",
-    "price": "25.00",
-    "currency": "USD"
-  },
-  {
-    "id": "3",
-    "name": "CheapItem",
-    "price": "5.00",
-    "currency": "USD"
-  },
-  {
-    "id": "4",
-    "name": "Doohickey",
-    "price": "12.50",
-    "currency": "USD"
-  },
-  {
-    "id": "5",
-    "name": "Thingamajig",
-    "price": "8.75",
-    "currency": "USD"
-  }
+  { "id": "1", "name": "Widget", "price": "15.00", "currency": "USD" },
+  { "id": "2", "name": "Gadget", "price": "25.00", "currency": "USD" },
+  { "id": "3", "name": "CheapItem", "price": "5.00", "currency": "USD" },
+  { "id": "4", "name": "Doohickey", "price": "12.50", "currency": "USD" },
+  { "id": "5", "name": "Thingamajig", "price": "8.75", "currency": "USD" }
 ]

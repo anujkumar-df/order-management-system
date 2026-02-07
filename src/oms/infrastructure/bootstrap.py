@@ -8,6 +8,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from oms.infrastructure.persistence.json_inventory_repository import (
+    JsonInventoryRepository,
+)
 from oms.infrastructure.persistence.json_order_repository import (
     JsonOrderRepository,
 )
@@ -26,3 +29,7 @@ def product_repository() -> JsonProductRepository:
 
 def order_repository() -> JsonOrderRepository:
     return JsonOrderRepository(_DATA_DIR / "orders.json")
+
+
+def inventory_repository() -> JsonInventoryRepository:
+    return JsonInventoryRepository(_DATA_DIR / "inventory.json")

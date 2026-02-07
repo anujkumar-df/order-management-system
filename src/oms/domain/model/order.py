@@ -89,6 +89,31 @@ class Order:
 
         return order
 
+    # --- State transitions ----------------------------------------------------
+
+    def confirm(self) -> None:
+        """Transition DRAFT -> CONFIRMED.
+
+        Inventory reservation must happen *before* calling this
+        (coordinated by the application handler via the domain service).
+        """
+        if self.status != OrderStatus.DRAFT:
+            raise ValidationError(
+                f"Cannot confirm order — current status is {self.status.value}, "
+                f"expected DRAFT"
+            )
+        self.status = OrderStatus.CONFIRMED
+
+    def cancel(self) -> None:
+        """Transition DRAFT|CONFIRMED -> CANCELLED.
+
+        If the order was CONFIRMED, inventory release must happen
+        *before* calling this.
+        """
+        if self.status == OrderStatus.CANCELLED:
+            raise ValidationError("Order is already cancelled")
+        self.status = OrderStatus.CANCELLED
+
     # --- Computed properties --------------------------------------------------
 
     @property

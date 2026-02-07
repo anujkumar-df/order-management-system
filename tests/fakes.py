@@ -6,8 +6,10 @@ but keep everything in a dict. No file I/O, no side effects.
 
 from __future__ import annotations
 
+from oms.domain.model.inventory import InventoryItem
 from oms.domain.model.order import Order
 from oms.domain.model.product import Product
+from oms.domain.repository.inventory_repository import InventoryRepository
 from oms.domain.repository.order_repository import OrderRepository
 from oms.domain.repository.product_repository import ProductRepository
 
@@ -52,3 +54,20 @@ class FakeProductRepository(ProductRepository):
 
     def save(self, product: Product) -> None:
         self._store[product.id] = product
+
+
+class FakeInventoryRepository(InventoryRepository):
+
+    def __init__(self, items: list[InventoryItem] | None = None) -> None:
+        self._store: dict[str, InventoryItem] = {}
+        for item in items or []:
+            self._store[item.product_id] = item
+
+    def get_by_product_id(self, product_id: str) -> InventoryItem | None:
+        return self._store.get(product_id)
+
+    def list_all(self) -> list[InventoryItem]:
+        return list(self._store.values())
+
+    def save(self, item: InventoryItem) -> None:
+        self._store[item.product_id] = item

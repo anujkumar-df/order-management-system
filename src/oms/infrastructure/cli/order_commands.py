@@ -4,11 +4,17 @@ from __future__ import annotations
 
 import click
 
+from oms.application.cancel_order import CancelOrderHandler
+from oms.application.confirm_order import ConfirmOrderHandler
 from oms.application.create_order import CreateOrderHandler
 from oms.application.dto import OrderItemSpec
 from oms.application.show_order import ShowOrderHandler
 from oms.domain.exceptions import DomainException
-from oms.infrastructure.bootstrap import order_repository, product_repository
+from oms.infrastructure.bootstrap import (
+    inventory_repository,
+    order_repository,
+    product_repository,
+)
 
 
 def _parse_items(raw: str) -> list[OrderItemSpec]:
@@ -89,3 +95,37 @@ def order_show(order_id: int) -> None:
         raise click.ClickException(str(exc))
 
     _display_order(dto)
+
+
+@click.command("confirm")
+@click.option("--id", "order_id", required=True, type=int, help="Order ID to confirm.")
+def order_confirm(order_id: int) -> None:
+    """Confirm a draft order (reserves inventory)."""
+    handler = ConfirmOrderHandler(
+        order_repo=order_repository(),
+        inventory_repo=inventory_repository(),
+    )
+
+    try:
+        handler.handle(order_id)
+    except DomainException as exc:
+        raise click.ClickException(str(exc))
+
+    click.echo(f"Order #{order_id} confirmed — inventory reserved.")
+
+
+@click.command("cancel")
+@click.option("--id", "order_id", required=True, type=int, help="Order ID to cancel.")
+def order_cancel(order_id: int) -> None:
+    """Cancel an order (releases reserved inventory if confirmed)."""
+    handler = CancelOrderHandler(
+        order_repo=order_repository(),
+        inventory_repo=inventory_repository(),
+    )
+
+    try:
+        handler.handle(order_id)
+    except DomainException as exc:
+        raise click.ClickException(str(exc))
+
+    click.echo(f"Order #{order_id} cancelled.")
